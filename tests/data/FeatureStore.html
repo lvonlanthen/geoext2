@@ -226,6 +226,37 @@
             t.eq(store.getCount(), 0, 'remove on store with "remove" removes the record from the store');
             t.eq(layer.features.length, 0, 'remove on store with "remove" removes the corresponding feature from layer');
         }
+        
+        function test_add_multipleFeatures(t) {
+        	t.plan(6);
+        	
+        	var layer = new OpenLayers.Layer.Vector();
+        	var store = Ext.create('GeoExt.data.FeatureStore', {
+        		model: 'My.Test.Model',
+        		layer: layer
+        	});
+        	
+        	var feature1 = new OpenLayers.Feature.Vector(null, {
+        		foo: 'Foo1',
+        		ele: 0
+        	});
+        	var feature2 = new OpenLayers.Feature.Vector(null, {
+        		foo: 'Foo2',
+        		ele: 1
+        	});
+        	
+        	store.addFeatures(feature1);
+        	t.eq(store.getCount(), 1, 'Adding first feature to the store');
+        	t.eq(layer.features.length, 1, 'Adding first feature to the store does create corresponding feature in layer');
+        	
+        	store.addFeatures(feature2);
+        	t.eq(store.getCount(), 2, 'Adding second feature to the store');
+        	t.eq(layer.features.length, 2, 'Adding second feature to the store does create corresponding feature in layer');
+        	
+        	store.addFeatures(feature2);
+        	t.eq(store.getCount(), 2, 'It is not possible to add the same feature to the store again');
+        	t.eq(layer.features.length, 2, 'When trying to add same feature to store again it should not appear in layer');
+        }
 
         function test_getByFeature(t) {
             t.plan(2);

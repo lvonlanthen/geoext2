@@ -262,7 +262,7 @@ Ext.define('GeoExt.data.FeatureStore', {
      * @param {Object} evt
      */
     onFeaturesAdded: function(evt) {
-         if (!this._adding) {
+        if (!this._adding) {
             var features = evt.features, toAdd = features;
             if (this.featureFilter) {
                 toAdd = [];
@@ -325,12 +325,18 @@ Ext.define('GeoExt.data.FeatureStore', {
      */
     onLoad: function(store, records, successful) {
         if (successful) {
-            this._removing = true;
-            this.layer.removeAllFeatures();
-            delete this._removing;
-
-            this.addFeaturesToLayer(records);
+            if (!this._addRecords) {
+                this._removing = true;
+                this.layer.removeAllFeatures();
+                delete this._removing;
+            }
+            if (!this._adding) {
+                this._adding = true;
+                this.addFeaturesToLayer(records);
+                delete this._adding;
+            }
         }
+        delete this._addRecords;
     },
 
     /**
@@ -404,5 +410,12 @@ Ext.define('GeoExt.data.FeatureStore', {
                 delete this._updating;
             }
         }
+    },
+    
+    loadRecords: function(records, options) {
+        if (options && options.addRecords) {
+            this._addRecords = true;
+        }
+        this.callParent(arguments);
     }
 });
